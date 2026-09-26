@@ -283,10 +283,9 @@ class PointJepa(pl.LightningModule):
         self.target_sampler.setup_device(tokens.device)
         self.context_sampler.setup_device(tokens.device)
     
-        # Old paper implementation:
-        # evaluate the shared encoder positional map before the
-        # stop-gradient EMA-teacher computation. generate_targets()
-        # itself remains @torch.no_grad().
+        # Adaptive PE (the paper's primary configuration): the shared positional
+        # map is evaluated outside torch.no_grad(), so it is trained end-to-end.
+        # The EMA teacher itself runs under @torch.no_grad() in generate_targets().
         pos_r = self.positional_encoding(cen_r)
         target_global = self.generate_targets(tok_r, pos_r)
         target_blocks, tgt_pos = self.target_sampler.sample(target_global)
@@ -326,11 +325,10 @@ class PointJepa(pl.LightningModule):
         dev = tokens.device
         n = int(self.hparams.num_orderings)
 
-        # Old paper implementation:
-        # evaluate the shared encoder positional map once before the
-        # stop-gradient EMA-teacher computation. generate_targets()
-        # itself remains @torch.no_grad(); the teacher is still evaluated
-        # once on the original tokenized cloud before directional folding.
+        # Adaptive PE (the paper's primary configuration): the shared positional
+        # map is evaluated outside torch.no_grad(), so it is trained end-to-end.
+        # The EMA teacher runs once, under @torch.no_grad() in generate_targets(),
+        # on the original token order; its targets are then reordered per ordering.
         pos = self.positional_encoding(centers)
         target_global = self.generate_targets(tokens, pos)                # (B,G,E) teacher ONCE
 
