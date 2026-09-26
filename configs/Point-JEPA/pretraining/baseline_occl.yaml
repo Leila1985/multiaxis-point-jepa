@@ -1,0 +1,25 @@
+seed_everything: 1
+trainer:
+  logger:
+    class_path: pytorch_lightning.loggers.CSVLogger
+    init_args:
+      save_dir: ./artifacts
+      name: baseline_occl
+model:
+  masking_mode: pj_baseline
+  target_sample_method: contiguous
+  context_sample_method: contiguous
+  num_targets_per_sample: 4
+  target_sample_ratio:
+  - 0.15
+  - 0.2
+  context_sample_ratio:
+  - 0.4
+  - 0.75
+  train_transformations:
+  - occlude
+  - subsample
+  - scale
+  - center
+  - unit_sphere
+  - rotate
