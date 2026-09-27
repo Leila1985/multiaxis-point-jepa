@@ -125,6 +125,8 @@ class PointJepa(pl.LightningModule):
                 )
             elif name == "occlude":
                 return transforms.PointcloudOcclusion()
+            elif name == "occlude_mild":
+                return transforms.PointcloudOcclusion(ratio_min=0.10, ratio_max=0.20)
             else:
                 raise RuntimeError(f"No such transformation: {name}")
 
