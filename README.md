@@ -1,15 +1,16 @@
 # Beyond a Single Ordering: Multi-Axis Serialization under Occlusion for Point-JEPA
 
-Official code for our WACV 2027 paper (under review).
+Official code for our WACV 2027 paper.
 
-This repository is built on [Point-JEPA](https://github.com/Ayumu-J-S/Point-JEPA). Exactly two stages are
-changed; the backbone, objective, optimizer, and evaluation protocols are Point-JEPA's.
+This repository builds on [Point-JEPA](https://github.com/Ayumu-J-S/Point-JEPA)
+and introduces multi-axis serialization and ball occlusion. Evaluation
+procedures are described below.
 
 1. **Multi-axis serialization** (`pointjepa/models/point_jepa.py`, `_forward_pj_multi`): the greedy token
-   sequencer is replaced by `num_orderings` fixed-direction sorts of the patch centers (coordinate axes by
+   sequencer is replaced by `num_orderings` directional sorts of the patch centers (coordinate axes by
    default, `ordering_basis: pca` for the principal-axes variant, `ordering_axes: "xz"` to pick axes
-   explicitly). All orderings are applied to the same cloud in the same step and folded into the batch;
-   one summed loss.
+   explicitly). All orderings are applied to the same cloud in the same step and folded
+into the batch, with a single loss averaged over the resulting predictions.
 2. **Ball occlusion** (`pointjepa/utils/transforms.py`, `PointcloudOcclusion`): a spatial crop that removes
    all points inside a random ball before tokenization.
 
@@ -20,11 +21,21 @@ sequencing inside this codebase.
 ## Installation
 
 ### 1. Dependencies
-- Python 3.10
-- CUDA 11.6 or above
+
+Verified environment on Narval (Compute Canada):
+
+- Python 3.10.13
+- PyTorch 2.1.2 and torchvision 0.16.2
+- PyTorch3D 0.7.5
+- PyTorch Lightning 1.9.5
+- CUDA 12.2 and cuDNN 8.9.5
+- GCC/G++ 12.3.1
+
+We also provide the original Point-JEPA installation script,
+which uses different dependency versions:
 
 ```bash
-./install_py.sh
+bash install_py.sh
 ```
 
 ### 2. Datasets
@@ -53,13 +64,25 @@ python -m pointjepa.datasets.process.check   # check if datasets are complete
 | Classification fine-tuned | ScanObjectNN PB-T50-RS | B | **89.0&pm;0.2** (OA) | [config](configs/Point-JEPA/classification/scanobjectnn_occl.yaml) | [checkpoint](https://drive.google.com/file/d/1sS8C6cL2o0FKdXnT_lYE-RHsYoB7NuX-/view?usp=sharing) |
 | Part segmentation fine-tuned | ShapeNetPart | A | **84.0&pm;0.1** / **85.9&pm;0.1** (Cls. / Inst. mIoU) | [config](configs/Point-JEPA/segmentation/shapenetpart.yaml) | [checkpoint](https://drive.google.com/file/d/1hAVuC9V2bYZXaEcOfpBB3sOKEiI0Lfu-/view?usp=sharing) |
 
-Protocol A follows Point-JEPA fine-tuning; Protocol B additionally uses ball occlusion during downstream
-training. Test inputs are unchanged. Fine-tuning numbers are mean &pm; standard deviation over 10 independent
-fine-tuning runs (seeds 1–10) from the single pre-trained checkpoint above; SVM numbers are mean &pm; standard
-deviation over 10 evaluation draws. All numbers are as reported in the paper.
+Protocol A follows the Point-JEPA downstream recipe. Protocol B additionally
+applies ball occlusion during downstream training; test inputs are unchanged.
 
-Please note that weights that are attached above are the ones that yield the best results out of 10
-independent runs. All files are also in one [Google Drive folder](https://drive.google.com/drive/folders/1f296BurSu6iTUJtmKZNehvolq4ywJ6Nw?usp=sharing).
+Fine-tuning results are mean ± standard deviation across downstream training
+seeds 1–10, starting from the single pre-trained checkpoint above.
+Frozen SVM results use a standalone script that directly extracts features
+from the frozen encoder without running the pretraining validation-loss loop.
+Feature extraction uses batch size 32, and a linear SVM with fixed C = 0.012
+is fitted on the training features and evaluated on the test features.
+We report mean accuracy ± population standard deviation across evaluation
+seeds 0–9. These statistics describe downstream training or evaluation
+variability, not variability across independent pretraining runs.
+
+The linked fine-tuned checkpoints are selected from the 10 downstream runs.
+The SVM row uses the same frozen pre-trained checkpoint as the pretraining row;
+no additional encoder training is performed for SVM evaluation.
+
+All files are also available in this
+[Google Drive folder](https://drive.google.com/drive/folders/1f296BurSu6iTUJtmKZNehvolq4ywJ6Nw?usp=sharing).
 
 ## Reproducing the results from the paper
 
@@ -128,14 +151,25 @@ done
 
 ### Frozen linear SVM
 
+### Frozen linear SVM (evaluation seeds 0–9)
+
 ```bash
-python -m eval.linear_probe --ckpt $CKPT --config configs/Point-JEPA/classification/modelnet40.yaml
-python -m eval.linear_probe --ckpt $CKPT --config configs/Point-JEPA/classification/_scanobjectnn_obj_bg.yaml
+CKPT=checkpoints/multiaxis_occl_pretrain_shapenet.ckpt
+
+python -m eval.linear_probe \
+    --ckpt "$CKPT" \
+    --config configs/Point-JEPA/classification/modelnet40.yaml \
+    --draws 10 --fixed-c 0.012
+
+python -m eval.linear_probe \
+    --ckpt "$CKPT" \
+    --config configs/Point-JEPA/classification/_scanobjectnn_obj_bg.yaml \
+    --draws 10 --fixed-c 0.012
 ```
 
-Features are `concat[max, mean]` over the frozen encoder tokens; a linear SVM with a single fixed
-`C = 0.012` (the value in Point-JEPA's code), averaged over 10 evaluation draws. The final partial batch is
-kept.
+Features concatenate max- and mean-pooled frozen encoder tokens.
+The script evaluates seeds 0–9 and reports mean accuracy ± population
+standard deviation. The final partial batch is retained.
 
 ### Table S1 (representation under partial observation)
 
