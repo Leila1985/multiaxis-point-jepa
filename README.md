@@ -149,7 +149,6 @@ do
 done
 ```
 
-### Frozen linear SVM
 
 ### Frozen linear SVM (evaluation seeds 0–9)
 
@@ -171,11 +170,6 @@ Features concatenate max- and mean-pooled frozen encoder tokens.
 The script evaluates seeds 0–9 and reports mean accuracy ± population
 standard deviation. The final partial batch is retained.
 
-### Table S1 (representation under partial observation)
-
-```bash
-python scripts/table_s1_partial_observation.py evaluate --checkpoint $CKPT
-```
 
 ## Notes
 
@@ -184,9 +178,7 @@ python scripts/table_s1_partial_observation.py evaluate --checkpoint $CKPT
   in that the teacher-target branch, including the positional-encoding call used to construct teacher
   targets, is wrapped in `torch.no_grad()`, following the reference Point-JEPA structure. All headline numbers
   use Adaptive PE.
-- `torch.linalg.eigh` has no half-precision CUDA kernel, so the principal-axes branch computes the 3×3
-  eigendecomposition in fp32 and casts back.
-
+  
 ## Acknowledgements
 
 This codebase is built upon [Point-JEPA](https://github.com/Ayumu-J-S/Point-JEPA), which itself builds on
