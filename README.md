@@ -118,12 +118,20 @@ python -m pointjepa.eval.voting \
 ```
 
 ### Few-shot classification (ModelNet40, 10 folds)
+Training uses seed 0 for every fold. Results are reported as mean ±
+sample standard deviation of the best-epoch accuracy across folds 0–9.
 
 ```bash
-python -m pointjepa.tasks.classification fit \
-    --config configs/Point-JEPA/classification/modelnet_fewshot.yaml \
-    --model.pretrained_ckpt_path $CKPT \
-    --data.way 5 --data.shot 10 --data.fold 0
+CKPT=checkpoints/multiaxis_occl_pretrain_shapenet.ckpt
+
+for fold in $(seq 0 9)
+do
+    python -m pointjepa.tasks.classification fit \
+        --config configs/Point-JEPA/classification/modelnet_fewshot.yaml \
+        --model.pretrained_ckpt_path "$CKPT" \
+        --seed_everything 0 \
+        --data.way 5 --data.shot 10 --data.fold "$fold"
+done
 ```
 
 Protocol B: `modelnet_fewshot_occl.yaml`.
