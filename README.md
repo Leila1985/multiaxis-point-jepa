@@ -64,24 +64,14 @@ python -m pointjepa.datasets.process.check   # check if datasets are complete
 | Classification fine-tuned | ScanObjectNN PB-T50-RS | B | **89.0&pm;0.2** (OA) | [config](configs/Point-JEPA/classification/scanobjectnn_occl.yaml) | [checkpoint](https://drive.google.com/file/d/1sS8C6cL2o0FKdXnT_lYE-RHsYoB7NuX-/view?usp=sharing) |
 | Part segmentation fine-tuned | ShapeNetPart | A | **84.0&pm;0.1** / **85.9&pm;0.1** (Cls. / Inst. mIoU) | [config](configs/Point-JEPA/segmentation/shapenetpart.yaml) | [checkpoint](https://drive.google.com/file/d/1hAVuC9V2bYZXaEcOfpBB3sOKEiI0Lfu-/view?usp=sharing) |
 
-Protocol A follows the Point-JEPA downstream recipe. Protocol B additionally
-applies ball occlusion during downstream training; test inputs are unchanged.
+Protocol A follows the Point-JEPA downstream recipe. Protocol B adds
+ball occlusion during downstream training; test inputs are unchanged.
 
-Fine-tuning results are mean ± standard deviation across downstream training
-seeds 1–10, starting from the single pre-trained checkpoint above.
-Frozen SVM results use a standalone script that directly extracts features
-from the frozen encoder without running the pretraining validation-loss loop.
-Feature extraction uses batch size 32, and a linear SVM with fixed C = 0.012
-is fitted on the training features and evaluated on the test features.
-We report mean accuracy ± population standard deviation across evaluation
-seeds 0–9. These statistics describe downstream training or evaluation
-variability, not variability across independent pretraining runs.
+Results are reported as mean ± standard deviation using a single
+pre-trained checkpoint. The linked fine-tuned checkpoints are selected
+from the 10 downstream runs.
 
-The linked fine-tuned checkpoints are selected from the 10 downstream runs.
-The SVM row uses the same frozen pre-trained checkpoint as the pretraining row;
-no additional encoder training is performed for SVM evaluation.
-
-All files are also available in this
+All checkpoints are also available in this
 [Google Drive folder](https://drive.google.com/drive/folders/1f296BurSu6iTUJtmKZNehvolq4ywJ6Nw?usp=sharing).
 
 ## Reproducing the results from the paper
