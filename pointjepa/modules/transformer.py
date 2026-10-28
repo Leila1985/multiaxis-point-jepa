@@ -263,7 +263,7 @@ class TransformerPredictor(nn.Module):
         self.mask_token = nn.Parameter(torch.zeros(1, 1, predictor_embed_dim))
         # Might need trunc normal init here
 
-        # Here we use the same positional encoding as the student
+        #Positional encoding 
         self.positional_encoding = nn.Sequential(
             nn.Linear(3, 128),
             nn.GELU(),
