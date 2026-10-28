@@ -11,7 +11,7 @@ value in Point-JEPA's code), averaged over the evaluation draws.
 Example:
     python -m eval.linear_probe \
         --ckpt artifacts/<run>/version_0/checkpoints/epoch=499-step=40500.ckpt \
-        --config configs/Point-JEPA/classification/modelnet40.yaml
+        --config configs/classification/modelnet40.yaml
 """
 import argparse, importlib, inspect, os, tempfile, warnings
 import yaml, numpy as np, torch
