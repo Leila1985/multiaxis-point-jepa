@@ -106,8 +106,7 @@ done
 
 - OBJ-BG / OBJ-ONLY: add `--config configs/Point-JEPA/classification/_scanobjectnn_obj_bg.yaml`
   (or `_scanobjectnn_obj_only.yaml`) after the first config.
-- ModelNet40: `modelnet40.yaml` (Protocol A) or `modelnet40_occl.yaml` (Protocol B). The `*_best.yaml`
-  variants additionally save the best-epoch checkpoint used for voting.
+- ModelNet40: `modelnet40.yaml` (Protocol A) or `modelnet40_occl.yaml` (Protocol B). Both save the checkpoint with the highest non-voting validation accuracy for voting evaluation.
 
 Voting on ModelNet40 (maximum over 300 vote iterations of a fine-tuned checkpoint):
 
