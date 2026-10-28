@@ -171,11 +171,21 @@ standard deviation. The final partial batch is retained.
 
 ## Notes
 
-- Positional embedding: this code is the paper's primary configuration ("Adaptive PE"), in which the shared
-  positional map is trained end-to-end. The "Reference-style PE" arm of the directional ablation differs only
-  in that the teacher-target branch, including the positional-encoding call used to construct teacher
-  targets, is wrapped in `torch.no_grad()`, following the reference Point-JEPA structure. All headline numbers
-  use Adaptive PE.
+Adaptive PE (`encoder_pe_mode: adaptive`) is the default and is used for
+all headline results. Reference-style PE additionally places the
+teacher-side positional-encoding call inside `torch.no_grad()`.
+Both modes keep teacher targets detached and leave the student-side
+positional-encoding call outside `torch.no_grad()`.
+
+To select Reference-style PE, append its configuration last:
+
+```bash
+python -m pointjepa fit \
+    -c configs/Point-JEPA/pretraining/shapenet.yaml \
+    -c configs/Point-JEPA/pretraining/occl_xyz.yaml \
+    -c configs/Point-JEPA/pretraining/reference_style_pe.yaml
+```
+
   
 ## Acknowledgements
 
