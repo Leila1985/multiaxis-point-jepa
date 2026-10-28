@@ -1,18 +1,6 @@
-"""Frozen linear-probe evaluation.
+"""Evaluate a frozen pretrained encoder using a linear SVM."""
 
-Reproduces the probe protocol used in the paper: features are concat[max, mean] over the
-frozen student's final layer, a linear SVM is fit with a precomputed linear kernel, and
-the whole thing is repeated over several evaluation draws (the tokenizer's farthest-point
-sampling is stochastic, so each draw sees a different patch decomposition).
 
-Every frozen number reported in the paper uses a single fixed C (default 0.012, the
-value in Point-JEPA's code), averaged over the evaluation draws.
-
-Example:
-    python -m eval.linear_probe \
-        --ckpt artifacts/<run>/version_0/checkpoints/epoch=499-step=40500.ckpt \
-        --config configs/classification/modelnet40.yaml
-"""
 import argparse, importlib, inspect, os, tempfile, warnings
 import yaml, numpy as np, torch
 warnings.filterwarnings("ignore", message="Found keys that are not in the model")
