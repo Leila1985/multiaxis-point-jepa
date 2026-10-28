@@ -98,12 +98,12 @@ class PointJepa(pl.LightningModule):
         svm_validation_C=0.012,  # C=0.012 copied from Point-M2AE code
         fix_estimated_stepping_batches: Optional[int] = None,  # multi GPU bug fix
         pretrained_ckpt_path: str | None = None,
-        pe_style: str = "adaptive",
+        encoder_pe_mode: str = "adaptive",
     ) -> None:
         super().__init__()
-        if pe_style not in ("adaptive", "reference"):
+        if encoder_pe_mode not in ("adaptive", "reference"):
             raise ValueError(
-                f"Unknown pe_style: {pe_style!r}; "
+                f"Unknown pe_style: {encoder_pe_mode!r}; "
                 "expected 'adaptive' or 'reference'"
             )
         self.save_hyperparameters()
@@ -292,10 +292,13 @@ class PointJepa(pl.LightningModule):
         self.target_sampler.setup_device(tokens.device)
         self.context_sampler.setup_device(tokens.device)
     
-        # Adaptive PE (the paper's primary configuration): the shared positional
-        # map is evaluated outside torch.no_grad(), so it is trained end-to-end.
-        # The EMA teacher itself runs under @torch.no_grad() in generate_targets().
-        pos_r = self.positional_encoding(cen_r)
+        # Select the teacher-side positional-encoding execution.
+        if self.hparams.encoder_pe_mode == "reference":
+            with torch.no_grad():
+                pos_r = self.positional_encoding(cen_r)
+        else:
+            pos_r = self.positional_encoding(cen_r)
+
         target_global = self.generate_targets(tok_r, pos_r)
         target_blocks, tgt_pos = self.target_sampler.sample(target_global)
     
@@ -334,12 +337,16 @@ class PointJepa(pl.LightningModule):
         dev = tokens.device
         n = int(self.hparams.num_orderings)
 
-        # Adaptive PE (the paper's primary configuration): the shared positional
-        # map is evaluated outside torch.no_grad(), so it is trained end-to-end.
-        # The EMA teacher runs once, under @torch.no_grad() in generate_targets(),
-        # on the original token order; its targets are then reordered per ordering.
-        pos = self.positional_encoding(centers)
-        target_global = self.generate_targets(tokens, pos)                # (B,G,E) teacher ONCE
+        # Select the teacher-side positional-encoding execution.
+        # The teacher runs once before targets are reordered.
+        if self.hparams.encoder_pe_mode == "reference":
+            with torch.no_grad():
+                pos = self.positional_encoding(centers)
+        else:
+            pos = self.positional_encoding(centers)
+
+        target_global = self.generate_targets(tokens, pos)  # Teacher once
+       
 
         Et = target_global.shape[-1]
 
