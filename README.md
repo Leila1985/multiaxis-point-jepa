@@ -71,8 +71,6 @@ Results are reported as mean ± standard deviation using a single
 pre-trained checkpoint. The linked fine-tuned checkpoints are selected
 from the 10 downstream runs.
 
-All checkpoints are also available in this
-[Google Drive folder](https://drive.google.com/drive/folders/1f296BurSu6iTUJtmKZNehvolq4ywJ6Nw?usp=sharing).
 
 ## Reproducing the results from the paper
 
