@@ -196,11 +196,11 @@ Add `--with-chamfer` to also compute the raw-geometry reference.
 
 ## Notes
 
-Adaptive PE (`encoder_pe_mode: adaptive`) is the default and is used for
-all headline results. Reference-style PE additionally places the
-teacher-side positional-encoding call inside `torch.no_grad()`.
-Both modes keep teacher targets detached and leave the student-side
-positional-encoding call outside `torch.no_grad()`.
+Adaptive PE learns the shared positional map during pretraining.
+Under the mixed-precision training configuration used in the paper,
+Reference-style PE leaves this map unchanged because of the placement
+of the teacher-side positional-encoding call inside `torch.no_grad()`.
+All headline results use Adaptive PE.
 
 To select Reference-style PE, append its configuration last:
 
