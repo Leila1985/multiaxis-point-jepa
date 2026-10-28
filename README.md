@@ -53,7 +53,7 @@ python -m pointjepa.datasets.process.check
 | Type | Dataset | Protocol | Evaluation | Config | Checkpoint |
 | --- | --- | --- | --- | --- | --- |
 | Multi-axis + Occl. pre-trained | ShapeNet | – | – | [config](configs/pretraining/occl_xyz.yaml) | [checkpoint](https://drive.google.com/file/d/1KORh8U288Fc--ettbqV3FQxQkQrn_Tj5/view?usp=sharing) |
-| SVM Linear | ModelNet40 / OBJ-BG | – | **93.9&pm;0.2** / **85.5&pm;0.4** | – |- |
+| SVM Linear | ModelNet40 / OBJ-BG | – | **93.9&pm;0.2** / **85.5&pm;0.4** | – | – |
 | Classification fine-tuned | ModelNet40 | A | **93.9&pm;0.2** / **94.2&pm;0.2** (OA / Voting) | [config](configs/classification/modelnet40.yaml) | [checkpoint](https://drive.google.com/file/d/1xmGKQTRaDMX3PpK7x3mJumWKWF967EyN/view?usp=sharing) |
 | Classification fine-tuned | ModelNet40 | B | **93.8&pm;0.2** / **94.0&pm;0.2** (OA / Voting) | [config](configs/classification/modelnet40_occl.yaml) | [checkpoint](https://drive.google.com/file/d/1AfTdkMLF47e1M4SAQiT6Mh35NmlR4fT4/view?usp=sharing) |
 | Classification fine-tuned | ScanObjectNN OBJ-BG | A | **92.8&pm;0.2** (OA) | [config](configs/classification/scanobjectnn.yaml) + [OBJ-BG split](configs/classification/_scanobjectnn_obj_bg.yaml) | [checkpoint](https://drive.google.com/file/d/1Oo477k_fvvWqJYU2hDWRLGEnZY9C_pOC/view?usp=sharing) |
