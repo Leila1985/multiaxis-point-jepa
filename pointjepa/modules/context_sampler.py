@@ -39,7 +39,7 @@ class ContextSampler:
             torch.Tensor: The selected indices. Shape: (num_context_selct) 
         """
         selected_indices = torch.randperm(len(valid_indices), device=self._device)[:num_context_selct]
-        return selected_indices
+        return valid_indices[selected_indices]
 
     def get_context_contiguous_idx(self, valid_indices: torch.Tensor ,num_context_selct: int) -> torch.Tensor:
         """Select contiguous context tokens starting from random index.
