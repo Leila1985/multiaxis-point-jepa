@@ -231,13 +231,9 @@ class Compose:
 
 
 class PointcloudOcclusion(nn.Module):
-    """Simulated self-occlusion ("bite" crop): per cloud, pick a random seed point
-    and remove the ratio*N points NEAREST to it -- one contiguous missing patch,
-    as in partial real scans. Note: measured on our data, the bite does NOT make
-    geodesic distance diverge from Euclidean (Spearman 0.926 clean vs 0.925 occluded);
-    its effect is a contiguous crop under a fixed token budget. Apply BEFORE subsample
-    so the point count fed to the tokenizer stays constant. With prob (1-prob) the
-    cloud stays complete; never drops below min_keep (subsample safety)."""
+    """Apply ball occlusion with a shared batch probability and removal ratio,
+    independently sampled seed points per cloud, and a minimum retained count.
+    """
 
     def __init__(self, ratio_min: float = 0.25, ratio_max: float = 0.40,
                  prob: float = 0.7, min_keep: int = 1100):
