@@ -1,0 +1,3 @@
+# Apply after the base and selected pretraining configurations.
+model:
+  encoder_pe_mode: reference
