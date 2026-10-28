@@ -98,9 +98,16 @@ class PointJepa(pl.LightningModule):
         svm_validation_C=0.012,  # C=0.012 copied from Point-M2AE code
         fix_estimated_stepping_batches: Optional[int] = None,  # multi GPU bug fix
         pretrained_ckpt_path: str | None = None,
+        pe_style: str = "adaptive",
     ) -> None:
         super().__init__()
+        if pe_style not in ("adaptive", "reference"):
+            raise ValueError(
+                f"Unknown pe_style: {pe_style!r}; "
+                "expected 'adaptive' or 'reference'"
+            )
         self.save_hyperparameters()
+       
         
         def build_transformation(name: str) -> transforms.Transform:
             if name == "subsample":
